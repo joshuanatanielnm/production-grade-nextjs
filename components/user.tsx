@@ -1,7 +1,8 @@
+import { Avatar, LogOutIcon, Menu, Pane, Popover, Position, Text, majorScale } from 'evergreen-ui'
 import React, { FC } from 'react'
-import { Pane, Position, Avatar, Popover, Menu, LogOutIcon, majorScale, Text } from 'evergreen-ui'
-import { signOut } from 'next-auth/client'
+
 import { UserSession } from '../types'
+import { signOut } from 'next-auth/client'
 
 const User: FC<{ user: UserSession }> = ({ user }) => {
   return (

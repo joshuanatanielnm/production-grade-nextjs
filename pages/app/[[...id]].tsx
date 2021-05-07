@@ -1,13 +1,16 @@
+import { Dialog, Pane, majorScale } from 'evergreen-ui'
 import React, { FC, useState } from 'react'
-import { Pane, Dialog, majorScale } from 'evergreen-ui'
-import { useRouter } from 'next/router'
-import Logo from '../../components/logo'
-import FolderList from '../../components/folderList'
-import NewFolderButton from '../../components/newFolderButton'
-import User from '../../components/user'
-import FolderPane from '../../components/folderPane'
+import { getSession, useSession } from 'next-auth/client'
+
 import DocPane from '../../components/docPane'
+import FolderList from '../../components/folderList'
+import FolderPane from '../../components/folderPane'
+import Logo from '../../components/logo'
+import NewFolderButton from '../../components/newFolderButton'
 import NewFolderDialog from '../../components/newFolderDialog'
+import User from '../../components/user'
+import { UserSession } from '../../types'
+import { useRouter } from 'next/router'
 
 const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs?: any[] }> = ({
   folders,
@@ -17,6 +20,9 @@ const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs
 }) => {
   const router = useRouter()
   const [newFolderIsShown, setIsShown] = useState(false)
+  const [session, loading] = useSession()
+
+
 
   const Page = () => {
     if (activeDoc) {
@@ -29,8 +35,7 @@ const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs
 
     return null
   }
-
-  if (false) {
+  if (!session && !loading) {
     return (
       <Dialog
         isShown
@@ -47,6 +52,9 @@ const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs
     )
   }
 
+  if(loading){
+    return null
+  }
   return (
     <Pane position="relative">
       <Pane width={300} position="absolute" top={0} left={0} background="tint2" height="100vh" borderRight>
@@ -60,7 +68,7 @@ const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs
         </Pane>
       </Pane>
       <Pane marginLeft={300} width="calc(100vw - 300px)" height="100vh" overflowY="auto" position="relative">
-        <User user={{}} />
+        <User user={session.user} />
         <Page />
       </Pane>
       <NewFolderDialog close={() => setIsShown(false)} isShown={newFolderIsShown} onNewFolder={() => {}} />
@@ -70,6 +78,13 @@ const App: FC<{ folders?: any[]; activeFolder?: any; activeDoc?: any; activeDocs
 
 App.defaultProps = {
   folders: [],
+}
+
+export async function getServerSideProps(ctx) {
+ const session = await getSession(ctx)
+ return {
+     props: {session}
+ }
 }
 
 /**
@@ -83,4 +98,9 @@ App.defaultProps = {
  *
  * @param context
  */
+
+
+
+
+
 export default App
